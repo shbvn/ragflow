@@ -27,7 +27,7 @@ Implications you MUST respect:
 
 ## Read the BRD first
 
-**On your very first turn of any new session,** before answering anything else, read the following four sections of the BRD from `shbvn-docs/SHBVN_AI_Platform_BRD_v2.md`:
+**On your very first turn of any new session,** before answering anything else, read the following four sections of the BRD from `shbvn/docs/SHBVN_AI_Platform_BRD_v2.md`:
 
 1. Section 1 — Overview
 2. Section 3 — Architecture
@@ -82,7 +82,7 @@ Types: `feat`, `fix`, `docs`, `test`, `refactor`, `chore`, `perf`, `security`.
 - Config: `shbvn-config/`
 - Tests: `shbvn-tests/`
 - DB migrations: `shbvn-migrations/`
-- Docs: `shbvn-docs/`
+- Docs: `shbvn/docs/`
 
 ### Testing
 - Every new function: at least one unit test
@@ -102,7 +102,7 @@ Types: `feat`, `fix`, `docs`, `test`, `refactor`, `chore`, `perf`, `security`.
 
 ### Starting a session
 1. Read the BRD context (section "Read the BRD first" above)
-2. Read `shbvn-docs/progress.md` to see current state
+2. Read `shbvn/docs/progress.md` to see current state
 3. Confirm with me what we're working on
 4. Propose a plan for the session before coding
 
@@ -112,8 +112,8 @@ Types: `feat`, `fix`, `docs`, `test`, `refactor`, `chore`, `perf`, `security`.
 - If you need to read many files to understand something, do so — don't pattern-match from partial context
 
 ### Ending a session
-- Update `shbvn-docs/progress.md`
-- Record any new architectural decisions as ADRs in `shbvn-docs/decisions/`
+- Update `shbvn/docs/progress.md`
+- Record any new architectural decisions as ADRs in `shbvn/docs/decisions/`
 - Summarize what changed and what's next
 
 ## Glossary (quick reference)
