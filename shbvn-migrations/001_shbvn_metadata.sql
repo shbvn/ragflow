@@ -4,7 +4,7 @@
 -- Apply:    mysql -h ... -u ... -p ... rag_flow < 001_shbvn_metadata.sql
 -- Rollback: mysql -h ... -u ... -p ... rag_flow < 001_shbvn_metadata.down.sql
 --
--- BRD ref:  shbvn-docs/SHBVN_AI_Platform_BRD_v2.md §8 (Module 3)
+-- BRD ref:  shbvn/docs/SHBVN_AI_Platform_BRD_v2.md §8 (Module 3)
 -- ADR ref:  shbvn/docs/decisions/0003-metadata-storage-mysql-authoritative.md
 --           shbvn/docs/decisions/0004-role-resolution-pluggable.md
 -- Errata:   shbvn/docs/brd-errata.md — BRD §8.2 referenced but absent; six-category

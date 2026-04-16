@@ -66,11 +66,15 @@ contains `SHBVN_AI_Platform_BRD_v2.md`, `decisions/0001-*.md`, and
 `progress.md`. Session 2A authoritative decision: `shbvn/docs/` (path
 under `shbvn/`, no hyphen) is canonical.
 
-**Resolution:** Session 2A writes **new** docs (0003, 0004, this errata)
-to `shbvn/docs/`. A follow-up migration commit will `git mv shbvn-docs
-shbvn/docs` and update references in `CLAUDE.md`, `shbvn-docs/README.md`,
-and BRD §4.1. Until that migration lands, any BRD or CLAUDE.md reference
-to `shbvn-docs/` should be read as `shbvn/docs/`.
+**Resolution:** Session 2A wrote **new** docs (0003, 0004, this errata)
+to `shbvn/docs/`. Migration completed in branch
+`chore/docs-folder-migration` (2026-04-16): all contents of `shbvn-docs/`
+moved to `shbvn/docs/`; CLAUDE.md + migration 001 SQL header references
+updated.
+
+**Residual drift:** BRD §4.1 still writes `shbvn-docs/`. Per BRD
+read-only policy, BRD text is not edited; the path in BRD v2 should be
+read as `shbvn/docs/`. Fix in BRD v3 revision.
 
 ---
 
@@ -108,13 +112,16 @@ authoritative. The 2B projector will denormalise to ES with the
 
 ---
 
-## Follow-up migration work (not part of Session 2A)
+## Follow-up work
 
-1. `git mv shbvn-docs shbvn/docs` (per E-004).
-2. Update `CLAUDE.md` references from `shbvn-docs/` → `shbvn/docs/`.
-3. Issue a BRD v3 revision that either (a) removes the §8.2 / §7.2
-   references or (b) fills them in. Decide which in a separate review.
+1. ~~`git mv shbvn-docs shbvn/docs` (per E-004).~~ **Done 2026-04-16**
+   in branch `chore/docs-folder-migration`.
+2. ~~Update `CLAUDE.md` references from `shbvn-docs/` → `shbvn/docs/`.~~
+   **Done** in same branch.
+3. BRD v3 revision: either (a) remove the §8.2 / §7.2 references or
+   (b) fill them in. Also update §4.1 path from `shbvn-docs/` to
+   `shbvn/docs/`. Decide in a separate review.
 
 ---
 
-*Last updated: 2026-04-16 (Session 2A, Module 3A metadata schema)*
+*Last updated: 2026-04-16 (Session 2A + docs-folder migration).*
