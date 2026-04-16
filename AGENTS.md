@@ -1,110 +1,62 @@
-# RAGFlow Project Instructions for GitHub Copilot
+# AGENTS.md
 
-This file provides context, build instructions, and coding standards for the RAGFlow project.
-It is structured to follow GitHub Copilot's [customization guidelines](https://docs.github.com/en/copilot/concepts/prompting/response-customization).
+This file provides guidance to OpenCode when working with code in this repository.
 
-## 1. Project Overview
-RAGFlow is an open-source RAG (Retrieval-Augmented Generation) engine based on deep document understanding. It is a full-stack application with a Python backend and a React/TypeScript frontend.
+## Project Overview
 
-- **Backend**: Python 3.10+ (Flask/Quart)
-- **Frontend**: TypeScript, React, UmiJS
-- **Architecture**: Microservices based on Docker.
-  - `api/`: Backend API server.
-  - `rag/`: Core RAG logic (indexing, retrieval).
-  - `deepdoc/`: Document parsing and OCR.
-  - `web/`: Frontend application.
+**Name:** claudekit-engineer
+**Type:** Node.js/TypeScript
+**Description:** A comprehensive boilerplate template for building professional software projects with **CLI Coding Agents** (**Claude Code** and **Open Code**). This template provides a complete development environment with AI-powered agent orchestration, automated workflows, and intelligent project management.
 
-## 2. Directory Structure
-- `api/`: Backend API server (Flask/Quart).
-  - `apps/`: API Blueprints (Knowledge Base, Chat, etc.).
-  - `db/`: Database models and services.
-- `rag/`: Core RAG logic.
-  - `llm/`: LLM, Embedding, and Rerank model abstractions.
-- `deepdoc/`: Document parsing and OCR modules.
-- `agent/`: Agentic reasoning components.
-- `web/`: Frontend application (React + UmiJS).
-- `docker/`: Docker deployment configurations.
-- `sdk/`: Python SDK.
-- `test/`: Backend tests.
+## Role & Responsibilities
 
-## 3. Build Instructions
+Your role is to analyze user requirements, delegate tasks to appropriate sub-agents, and ensure cohesive delivery of features that meet specifications and architectural standards.
 
-### Backend (Python)
-The project uses **uv** for dependency management.
+## Workflows
 
-1. **Setup Environment**:
-   ```bash
-   uv sync --python 3.12 --all-extras
-   uv run download_deps.py
-   ```
+- Primary workflow: `./.claude/rules/primary-workflow.md`
+- Development rules: `./.claude/rules/development-rules.md`
+- Orchestration protocols: `./.claude/rules/orchestration-protocol.md`
+- Documentation management: `./.claude/rules/documentation-management.md`
+- And other workflows: `./.claude/rules/*`
 
-2. **Run Server**:
-   - **Pre-requisite**: Start dependent services (MySQL, ES/Infinity, Redis, MinIO).
-     ```bash
-     docker compose -f docker/docker-compose-base.yml up -d
-     ```
-   - **Launch**:
-     ```bash
-     source .venv/bin/activate
-     export PYTHONPATH=$(pwd)
-     bash docker/launch_backend_service.sh
-     ```
+**IMPORTANT:** Analyze the skills catalog and activate the skills that are needed for the task during the process.
+**IMPORTANT:** DO NOT modify skills in `~/.claude/skills` directory directly. **MUST** modify skills in this current working directory. Unless you are asked to do so.
+**IMPORTANT:** You must follow strictly the development rules in `./.claude/rules/development-rules.md` file.
+**IMPORTANT:** Before you plan or proceed any implementation, always read the `./README.md` file first to get context.
+**IMPORTANT:** Sacrifice grammar for the sake of concision when writing reports.
+**IMPORTANT:** In reports, list any unresolved questions at the end, if any.
 
-### Frontend (TypeScript/React)
-Located in `web/`.
+## Development Principles
 
-1. **Install Dependencies**:
-   ```bash
-   cd web
-   npm install
-   ```
+- **YAGNI**: You Aren't Gonna Need It - avoid over-engineering
+- **KISS**: Keep It Simple, Stupid - prefer simple solutions
+- **DRY**: Don't Repeat Yourself - eliminate code duplication
 
-2. **Run Dev Server**:
-   ```bash
-   npm run dev
-   ```
-   Runs on port 8000 by default.
+## Documentation
 
-### Docker Deployment
-To run the full stack using Docker:
-```bash
-cd docker
-docker compose -f docker-compose.yml up -d
+Keep all important docs in `./docs` folder:
+
+```
+./docs
+├── project-overview-pdr.md
+├── code-standards.md
+├── codebase-summary.md
+├── design-guidelines.md
+└── system-architecture.md
 ```
 
-## 4. Testing Instructions
+## External Files
 
-### Backend Tests
-- **Run All Tests**:
-  ```bash
-  uv run pytest
-  ```
-- **Run Specific Test**:
-  ```bash
-  uv run pytest test/test_api.py
-  ```
+Reference external instruction files in `opencode.json`:
 
-### Frontend Tests
-- **Run Tests**:
-  ```bash
-  cd web
-  npm run test
-  ```
+```json
+{
+  "instructions": ["docs/*.md", ".opencode/agents/*.md"]
+}
+```
 
-## 5. Coding Standards & Guidelines
-- **Python Formatting**: Use `ruff` for linting and formatting.
-  ```bash
-  ruff check
-  ruff format
-  ```
-- **Frontend Linting**:
-  ```bash
-  cd web
-  npm run lint
-  ```
-- **Pre-commit**: Ensure pre-commit hooks are installed.
-  ```bash
-  pre-commit install
-  pre-commit run --all-files
-  ```
+---
 
+*Generated by ClaudeKit OpenCode Generator*
+*Date: 2026-04-03*
