@@ -1,0 +1,12 @@
+# Override for local dev-test: mount nginx configs from host
+# because v0.24.0 image is older than the entrypoint.sh in repo's main branch,
+# which expects /etc/nginx/conf.d/ragflow.conf.python to exist inside the image.
+services:
+  ragflow-cpu:
+    volumes:
+      - ./nginx/ragflow.conf.python:/etc/nginx/conf.d/ragflow.conf.python:ro
+      - ./nginx/ragflow.conf.golang:/etc/nginx/conf.d/ragflow.conf.golang:ro
+      - ./nginx/ragflow.conf.hybrid:/etc/nginx/conf.d/ragflow.conf.hybrid:ro
+      - ./nginx/proxy.conf:/etc/nginx/proxy.conf:ro
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ragflow.https.conf:/etc/nginx/conf.d/ragflow.https.conf:ro
