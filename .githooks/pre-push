@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+# Guardrail: block any push to a remote other than `origin`.
+# Prevents accidentally pushing to upstream (infiniflow/ragflow) or any other remote.
+
+set -eu
+
+remote_name="${1:-}"
+remote_url="${2:-}"
+
+# Allowlist: only `origin` may be pushed to.
+ALLOWED_REMOTE="origin"
+
+if [ "$remote_name" != "$ALLOWED_REMOTE" ]; then
+  printf '\n\033[1;31m[pre-push] BLOCKED\033[0m — push target is "%s" (%s)\n' "$remote_name" "$remote_url" >&2
+  printf 'Only pushes to "%s" are allowed. To override once:\n' "$ALLOWED_REMOTE" >&2
+  printf '  git -c core.hooksPath=/dev/null push ...\n\n' >&2
+  exit 1
+fi
+
+# Extra safety: if the remote URL points to infiniflow/ragflow, block it even if renamed to origin.
+case "$remote_url" in
+  *infiniflow/ragflow*|*infiniflow/RAGFlow*)
+    printf '\n\033[1;31m[pre-push] BLOCKED\033[0m — url matches upstream (infiniflow/ragflow)\n' >&2
+    printf 'Reconfigure `origin` to your fork before pushing.\n\n' >&2
+    exit 1
+    ;;
+esac
+
+# Extra safety: refuse force-push to protected branches on origin.
+protected_branches="main master dev beta release"
+while read -r local_ref _local_sha remote_ref _remote_sha; do
+  [ -z "${remote_ref:-}" ] && continue
+  branch="${remote_ref#refs/heads/}"
+  for p in $protected_branches; do
+    if [ "$branch" = "$p" ]; then
+      # Detect force-push by checking if --force was in the command.
+      # Git does not pass the flag to the hook; we rely on reflog heuristic.
+      # If remote ref is ahead of local, the push would be non-fast-forward.
+      if [ -n "${_remote_sha:-}" ] && [ "${_remote_sha}" != "0000000000000000000000000000000000000000" ]; then
+        if ! git merge-base --is-ancestor "${_remote_sha}" "${_local_sha}" 2>/dev/null; then
+          printf '\n\033[1;31m[pre-push] BLOCKED\033[0m — non-fast-forward push to protected branch "%s"\n' "$branch" >&2
+          printf 'Force-push to protected branches is disallowed. Use a feature branch.\n\n' >&2
+          exit 1
+        fi
+      fi
+    fi
+  done
+done
+
+exit 0
