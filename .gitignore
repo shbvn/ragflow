@@ -231,3 +231,20 @@ internal/cpp/cmake-build-debug/
 # Go server build output
 bin/*
 !bin/.gitkeep
+
+# Local dev tooling (not shared)
+.claude/skills/
+.claude/session-state/
+.claude/metadata.json
+.claude/agents/
+.claude/output-styles/
+.claude/schemas/
+.claude/scripts/
+.claude/.env.example
+.claude/.ckignore
+.claude/.mcp.json.example
+.claude/.gitignore
+.opencode/
+release-manifest.json
+docker/.env.backup*
+.claude/hooks/.logs/
