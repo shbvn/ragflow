@@ -248,3 +248,4 @@ bin/*
 release-manifest.json
 docker/.env.backup*
 .claude/hooks/.logs/
+.claude/.ck.json
