@@ -20,8 +20,21 @@ import infinity.rag_tokenizer
 # Vietnamese-aware tokenization: the upstream splitter is ASCII-only and
 # shatters accented Latin into per-letter tokens ("đ i ề u"), killing the
 # BM25/keyword leg for Vietnamese. Tokenization logic lives in shbvn_core;
-# this file only routes Vietnamese-bearing text to it.
-from shbvn_core.nlp import contains_vietnamese, fine_grained_vietnamese, tokenize_mixed
+# this file only routes Vietnamese-bearing text to it. shbvn_core ships
+# separately from this fork (workspace dev install / offline bundle):
+# when it is absent the hook must vanish and upstream behavior stay
+# intact, so a missing package downgrades to no Vietnamese routing
+# instead of killing rag.nlp at import.
+try:
+    from shbvn_core.nlp import (
+        contains_vietnamese,
+        fine_grained_vietnamese,
+        tokenize_mixed,
+    )
+except ImportError:
+    contains_vietnamese = None
+    fine_grained_vietnamese = None
+    tokenize_mixed = None
 # === SHBVN CUSTOMIZATION END ===
 
 
@@ -33,7 +46,7 @@ class RagTokenizer(infinity.rag_tokenizer.RagTokenizer):
             return line
         else:
             # === SHBVN CUSTOMIZATION START ===
-            if contains_vietnamese(line):
+            if contains_vietnamese is not None and contains_vietnamese(line):
                 return tokenize_mixed(line, fallback=super().tokenize)
             # === SHBVN CUSTOMIZATION END ===
             return super().tokenize(line)
@@ -45,7 +58,7 @@ class RagTokenizer(infinity.rag_tokenizer.RagTokenizer):
             return tks
         else:
             # === SHBVN CUSTOMIZATION START ===
-            if contains_vietnamese(tks):
+            if contains_vietnamese is not None and contains_vietnamese(tks):
                 return fine_grained_vietnamese(tks, fallback=super().fine_grained_tokenize)
             # === SHBVN CUSTOMIZATION END ===
             return super().fine_grained_tokenize(tks)

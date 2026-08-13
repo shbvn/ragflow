@@ -295,11 +295,19 @@ BULLET_PATTERN = [
 # chunk levels instead of headless shards. Pattern definitions and the
 # group-selection rule live in shbvn_core; this file only registers them.
 # The Vietnamese group MUST stay the LAST entry: select_bullet_group()
-# addresses its hit count as hits[-1].
-from shbvn_core.nlp import VIETNAMESE_BULLET_GROUP as _SHBVN_VN_BULLETS
-from shbvn_core.nlp import select_bullet_group as _shbvn_select_bullet_group
+# addresses its hit count as hits[-1]. shbvn_core ships separately from
+# this fork; when it is absent the group is simply not registered and
+# selection keeps the upstream argmax choice untouched.
+try:
+    from shbvn_core.nlp import VIETNAMESE_BULLET_GROUP as _SHBVN_VN_BULLETS
+    from shbvn_core.nlp import select_bullet_group as _shbvn_select_bullet_group
+except ImportError:
+    _SHBVN_VN_BULLETS = None
 
-if BULLET_PATTERN[-1] is not _SHBVN_VN_BULLETS:
+    def _shbvn_select_bullet_group(hits, res, sections):
+        return res
+
+if _SHBVN_VN_BULLETS is not None and BULLET_PATTERN[-1] is not _SHBVN_VN_BULLETS:
     BULLET_PATTERN.append(_SHBVN_VN_BULLETS)
 # === SHBVN CUSTOMIZATION END ===
 
