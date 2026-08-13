@@ -16,6 +16,14 @@
 
 import infinity.rag_tokenizer
 
+# === SHBVN CUSTOMIZATION START ===
+# Vietnamese-aware tokenization: the upstream splitter is ASCII-only and
+# shatters accented Latin into per-letter tokens ("đ i ề u"), killing the
+# BM25/keyword leg for Vietnamese. Tokenization logic lives in shbvn_core;
+# this file only routes Vietnamese-bearing text to it.
+from shbvn_core.nlp import contains_vietnamese, fine_grained_vietnamese, tokenize_mixed
+# === SHBVN CUSTOMIZATION END ===
+
 
 class RagTokenizer(infinity.rag_tokenizer.RagTokenizer):
     def tokenize(self, line: str) -> str:
@@ -24,6 +32,10 @@ class RagTokenizer(infinity.rag_tokenizer.RagTokenizer):
         if settings.DOC_ENGINE_INFINITY:
             return line
         else:
+            # === SHBVN CUSTOMIZATION START ===
+            if contains_vietnamese(line):
+                return tokenize_mixed(line, fallback=super().tokenize)
+            # === SHBVN CUSTOMIZATION END ===
             return super().tokenize(line)
 
     def fine_grained_tokenize(self, tks: str) -> str:
@@ -32,6 +44,10 @@ class RagTokenizer(infinity.rag_tokenizer.RagTokenizer):
         if settings.DOC_ENGINE_INFINITY:
             return tks
         else:
+            # === SHBVN CUSTOMIZATION START ===
+            if contains_vietnamese(tks):
+                return fine_grained_vietnamese(tks, fallback=super().fine_grained_tokenize)
+            # === SHBVN CUSTOMIZATION END ===
             return super().fine_grained_tokenize(tks)
 
 
