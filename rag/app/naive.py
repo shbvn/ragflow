@@ -62,6 +62,20 @@ from rag.nlp import (
     tokenize_chunks_with_images,
 )  # noqa: F401
 
+# === SHBVN CUSTOMIZATION START ===
+# Vietnamese regulatory documents label a table with an ordinary caption
+# paragraph ("Bảng 1. Phí dịch vụ tài khoản thanh toán") that carries no
+# Word Heading style, so __get_nearest_title below finds nothing and the
+# table is indexed with no anchor an answer can cite. Recognition lives in
+# shbvn_core; this file only asks. shbvn_core ships separately from this
+# fork, so a missing package must downgrade to upstream behavior instead
+# of killing the parser at import.
+try:
+    from shbvn_core.nlp import table_caption_title
+except ImportError:
+    table_caption_title = None
+# === SHBVN CUSTOMIZATION END ===
+
 
 def _is_short_header(text, max_tokens=50):
     """
@@ -456,6 +470,17 @@ class Docx(DocxParser):
                                 break
                 except Exception as e:
                     logging.error(f"Error parsing heading level: {e}")
+
+            # === SHBVN CUSTOMIZATION START ===
+            # An unstyled caption paragraph names the table just as well as
+            # a Heading-styled one. Rank 1 because a caption has no parent
+            # heading to climb to — the loop below then exits at once.
+            if table_caption_title is not None:
+                caption = table_caption_title(block.text)
+                if caption:
+                    nearest_title = (1, caption)
+                    break
+            # === SHBVN CUSTOMIZATION END ===
 
         if nearest_title:
             # Add current title
