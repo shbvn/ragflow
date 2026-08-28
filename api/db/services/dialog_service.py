@@ -53,6 +53,20 @@ from rag.utils.tts_cache import synthesize_with_cache
 from common.string_utils import remove_redundant_spaces
 from common import settings
 
+# === SHBVN CUSTOMIZATION START ===
+# Deterministic "Nguồn: <document> — <section label>" line appended to every
+# cited answer. The chat model places [ID:n] markers reliably but almost
+# never names its source section in prose, and the source label must be a
+# system guarantee, not a model habit. Label extraction lives in shbvn_core;
+# this file only wires it into the answer decoration. shbvn_core ships
+# separately from this fork; when it is absent answers simply carry no
+# mechanical source line.
+try:
+    from shbvn_core.nlp import build_citation_source_line as _shbvn_source_line
+except ImportError:
+    _shbvn_source_line = None
+# === SHBVN CUSTOMIZATION END ===
+
 
 def _chunk_kb_id_for_doc(row_dict, kb_ids, doc_id):
     if len(kb_ids or []) == 1:
@@ -793,6 +807,14 @@ async def async_chat(dialog, messages, stream=True, **kwargs):
     if "max_tokens" in gen_conf:
         gen_conf["max_tokens"] = min(gen_conf["max_tokens"], max_tokens - used_token_count)
 
+    # === SHBVN CUSTOMIZATION START ===
+    # Holder rather than a plain nonlocal: the streaming branch must read the
+    # line decorate_answer computed, because the final streaming payload ships
+    # with an empty answer and appended text would otherwise never reach a
+    # streaming client.
+    shbvn_source = {"line": ""}
+    # === SHBVN CUSTOMIZATION END ===
+
     async def decorate_answer(answer):
         nonlocal embd_mdl, prompt_config, knowledges, kwargs, kbinfos, prompt, retrieval_ts, questions, langfuse_generation
 
@@ -825,6 +847,16 @@ async def async_chat(dialog, messages, stream=True, **kwargs):
                         idx.add(i)
 
             answer, idx = repair_bad_citation_formats(answer, kbinfos, idx)
+
+            # === SHBVN CUSTOMIZATION START ===
+            # After citation repair the [ID:n] markers are final; the source
+            # line is rebuilt from exactly the chunks they name. A refusal or
+            # an uncited answer yields no line.
+            if _shbvn_source_line is not None:
+                shbvn_source["line"] = _shbvn_source_line(answer, kbinfos["chunks"])
+                if shbvn_source["line"]:
+                    answer = answer.rstrip() + "\n\n" + shbvn_source["line"]
+            # === SHBVN CUSTOMIZATION END ===
 
             idx = set([kbinfos["chunks"][int(i)]["doc_id"] for i in idx])
             recall_docs = [d for d in kbinfos["doc_aggs"] if d["doc_id"] in idx]
@@ -920,6 +952,20 @@ async def async_chat(dialog, messages, stream=True, **kwargs):
             final["final"] = True
             final["audio_binary"] = None
             final["answer"] = ""
+            # === SHBVN CUSTOMIZATION START ===
+            # Streaming clients assemble the message from answer deltas and the
+            # final payload's answer is empty by contract, so the source line
+            # travels as one extra delta ahead of it; structure_answer appends
+            # deltas to the persisted message, keeping stored and streamed text
+            # identical.
+            if shbvn_source["line"]:
+                yield {
+                    "answer": "\n\n" + shbvn_source["line"],
+                    "reference": {},
+                    "audio_binary": tts(tts_mdl, shbvn_source["line"]),
+                    "final": False,
+                }
+            # === SHBVN CUSTOMIZATION END ===
             yield final
     else:
         if llm_model_config["model_type"] == "chat":
